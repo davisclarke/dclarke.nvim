@@ -7,9 +7,10 @@ vim.opt.number = true
 vim.opt.relativenumber = true
 vim.opt.ruler = false
 vim.opt.numberwidth = 2
-
+vim.opt.redrawtime = 100
+-- vim.opt.cmdheight = 0
 -- Enable mouse mode, can be useful for resizing splits for example!
-vim.opt.mouse = 'a'
+-- vim.opt.mouse = 'a'
 
 -- Don't show the mode, since it's already in the status line
 vim.opt.showmode = false
@@ -36,7 +37,7 @@ vim.opt.smartcase = true
 vim.opt.signcolumn = 'yes'
 
 -- Decrease update time
-vim.opt.updatetime = 150
+vim.opt.updatetime = 250
 
 -- Decrease mapped sequence wait time
 vim.opt.timeoutlen = 300
@@ -60,9 +61,12 @@ vim.opt.cursorline = true
 -- Minimal number of screen lines to keep above and below the cursor.
 vim.opt.scrolloff = 10
 
+-- Swap ; and :
+vim.keymap.set('n', ';', ':')
+vim.keymap.set('n', ':', ';')
 -- [[ Basic Keymaps ]]
 --  See `:help vim.keymap.set()`
-
+vim.keymap.set('n', '<leader>u', '<cmd>update<CR>')
 -- Clear highlights on search when pressing <Esc> in normal mode
 --  See `:help hlsearch`
 vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
@@ -254,6 +258,20 @@ require('lazy').setup({
     end,
   },
   {
+    'folke/flash.nvim',
+    event = 'VeryLazy',
+    ---@type Flash.Config
+    opts = {},
+  -- stylua: ignore
+  keys = {
+    { "s", mode = { "n", "x", "o" }, function() require("flash").jump() end, desc = "Flash" },
+    { "S", mode = { "n", "x", "o" }, function() require("flash").treesitter() end, desc = "Flash Treesitter" },
+    { "r", mode = "o", function() require("flash").remote() end, desc = "Remote Flash" },
+    { "R", mode = { "o", "x" }, function() require("flash").treesitter_search() end, desc = "Treesitter Search" },
+    { "<c-s>", mode = { "c" }, function() require("flash").toggle() end, desc = "Toggle Flash Search" },
+  },
+  },
+  {
     'nvim-neo-tree/neo-tree.nvim',
     branch = 'v3.x',
     dependencies = {
@@ -285,6 +303,28 @@ require('lazy').setup({
     },
   },
   { 'Bilal2453/luvit-meta', lazy = true },
+  {
+    'L3MON4D3/LuaSnip',
+    -- follow latest release.
+    version = 'v2.*', -- Replace <CurrentMajor> by the latest released major (first number of latest release)
+    -- install jsregexp (optional!).
+    build = 'make install_jsregexp',
+  },
+  {
+    'lervag/vimtex',
+    lazy = false, -- lazy-loading will disable inverse search
+    config = function()
+      vim.g.vimtex_mappings_disable = { ['n'] = { 'K' } } -- disable `K` as it conflicts with LSP hover
+      vim.g.vimtex_quickfix_method = vim.fn.executable 'pplatex' == 1 and 'pplatex' or 'latexlog'
+    end,
+    init = function()
+      -- VimTeX configuration goes here, e.g.
+      vim.g.vimtex_view_method = 'zathura'
+    end,
+    keys = {
+      { '<localLeader>l', '', desc = '+vimtex', ft = 'tex' },
+    },
+  },
   {
     -- Main LSP Configuration
     'neovim/nvim-lspconfig',
@@ -410,6 +450,7 @@ require('lazy').setup({
       --  When you add nvim-cmp, luasnip, etc. Neovim now has *more* capabilities.
       --  So, we create new capabilities with nvim cmp, and then broadcast that to the servers.
       local capabilities = require('blink.cmp').get_lsp_capabilities()
+      -- local capabilities = vim.lsp.protocol.make_client_capabilities()
       -- capabilities = vim.tbl_deep_extend('force', capabilities, require('cmp_nvim_lsp').default_capabilities())
 
       -- Enable the following language servers
@@ -424,8 +465,10 @@ require('lazy').setup({
       local servers = {
         clangd = {},
         -- gopls = {},
+        ruff = {},
         pyright = {},
         rust_analyzer = {},
+        texlab = {},
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
         --
         -- Some languages (like typescript) have entire language plugins that can be useful:
@@ -434,7 +477,6 @@ require('lazy').setup({
         -- But for many setups, the LSP (`ts_ls`) will work just fine
         -- ts_ls = {},
         --
-
         lua_ls = {
           -- cmd = { ... },
           -- filetypes = { ... },
@@ -524,6 +566,66 @@ require('lazy').setup({
       },
     },
   },
+  -- lazy.nvim
+  {
+    'folke/noice.nvim',
+    event = 'VeryLazy',
+    -- opts = {
+    --   -- add any options here
+    -- },
+    dependencies = {
+      -- if you lazy-load any plugin below, make sure to add proper `module="..."` entries
+      'MunifTanjim/nui.nvim',
+      -- OPTIONAL:
+      --   `nvim-notify` is only needed, if you want to use the notification view.
+      --   If not available, we use `mini` as the fallback
+      -- 'rcarriga/nvim-notify',
+    },
+
+    config = function()
+      require('noice').setup {
+        lsp = {
+          -- override markdown rendering so that **cmp** and other plugins use **Treesitter**
+          override = {
+            ['vim.lsp.util.convert_input_to_markdown_lines'] = true,
+            ['vim.lsp.util.stylize_markdown'] = true,
+            ['cmp.entry.get_documentation'] = true, -- requires hrsh7th/nvim-cmp
+          },
+        },
+        -- you can enable a preset for easier configuration
+        presets = {
+          bottom_search = true, -- use a classic bottom cmdline for search
+          command_palette = true, -- position the cmdline and popupmenu together
+          long_message_to_split = true, -- long messages will be sent to a split
+          inc_rename = false, -- enables an input dialog for inc-rename.nvim
+          lsp_doc_border = false, -- add a border to hover docs and signature help
+        },
+        cmdline = {
+          view = 'cmdline',
+        },
+        views = {
+          cmdline_popup = {
+            border = {
+              style = 'single',
+            },
+          },
+          popup = {
+            border = {
+              style = 'single',
+            },
+          },
+
+          -- mini = {
+          --   border = {
+          --     style = 'single',
+          --   },
+          -- },
+        },
+      }
+    end,
+  },
+  -- Make noice less obtrusive
+  -- Blink.cmp is cool, but needs a little more time.
   {
     'saghen/blink.cmp',
     -- optional: provides snippets for the snippet source
@@ -563,10 +665,122 @@ require('lazy').setup({
     },
     opts_extend = { 'sources.default' },
   },
-  { -- You can easily change to a different colorscheme.
-    -- Change the name of the colorscheme plugin below, and then
-    -- change the command in the config to whatever the name of that colorscheme is.
-    --
+  -- { -- Autocompletion
+  --   'hrsh7th/nvim-cmp',
+  --   event = 'InsertEnter',
+  --   dependencies = {
+  --     -- Snippet Engine & its associated nvim-cmp source
+  --     {
+  --       'L3MON4D3/LuaSnip',
+  --       build = (function()
+  --         -- Build Step is needed for regex support in snippets.
+  --         -- This step is not supported in many windows environments.
+  --         -- Remove the below condition to re-enable on windows.
+  --         if vim.fn.has 'win32' == 1 or vim.fn.executable 'make' == 0 then
+  --           return
+  --         end
+  --         return 'make install_jsregexp'
+  --       end)(),
+  --       dependencies = {
+  --         -- `friendly-snippets` contains a variety of premade snippets.
+  --         --    See the README about individual language/framework/plugin snippets:
+  --         --    https://github.com/rafamadriz/friendly-snippets
+  --         {
+  --           'rafamadriz/friendly-snippets',
+  --           config = function()
+  --             require('luasnip.loaders.from_vscode').lazy_load()
+  --           end,
+  --         },
+  --       },
+  --     },
+  --     'saadparwaiz1/cmp_luasnip',
+  --
+  --     -- Adds other completion capabilities.
+  --     --  nvim-cmp does not ship with all sources by default. They are split
+  --     --  into multiple repos for maintenance purposes.
+  --     'hrsh7th/cmp-nvim-lsp',
+  --     'hrsh7th/cmp-path',
+  --   },
+  --   config = function()
+  --     -- See `:help cmp`
+  --     local cmp = require 'cmp'
+  --     local luasnip = require 'luasnip'
+  --     luasnip.config.setup {}
+  --
+  --     cmp.setup {
+  --       snippet = {
+  --         expand = function(args)
+  --           luasnip.lsp_expand(args.body)
+  --         end,
+  --       },
+  --       completion = { completeopt = 'menu,menuone,noinsert' },
+  --
+  --       -- For an understanding of why these mappings were
+  --       -- chosen, you will need to read `:help ins-completion`
+  --       --
+  --       -- No, but seriously. Please read `:help ins-completion`, it is really good!
+  --       mapping = cmp.mapping.preset.insert {
+  --         -- Select the [n]ext item
+  --         ['<C-n>'] = cmp.mapping.select_next_item(),
+  --         -- Select the [p]revious item
+  --         ['<C-p>'] = cmp.mapping.select_prev_item(),
+  --
+  --         -- Scroll the documentation window [b]ack / [f]orward
+  --         ['<C-b>'] = cmp.mapping.scroll_docs(-4),
+  --         ['<C-f>'] = cmp.mapping.scroll_docs(4),
+  --
+  --         -- Accept ([y]es) the completion.
+  --         --  This will auto-import if your LSP supports it.
+  --         --  This will expand snippets if the LSP sent a snippet.
+  --         ['<C-y>'] = cmp.mapping.confirm { select = true },
+  --
+  --         -- If you prefer more traditional completion keymaps,
+  --         -- you can uncomment the following lines
+  --         --['<CR>'] = cmp.mapping.confirm { select = true },
+  --         --['<Tab>'] = cmp.mapping.select_next_item(),
+  --         --['<S-Tab>'] = cmp.mapping.select_prev_item(),
+  --
+  --         -- Manually trigger a completion from nvim-cmp.
+  --         --  Generally you don't need this, because nvim-cmp will display
+  --         --  completions whenever it has completion options available.
+  --         ['<C-Space>'] = cmp.mapping.complete {},
+  --
+  --         -- Think of <c-l> as moving to the right of your snippet expansion.
+  --         --  So if you have a snippet that's like:
+  --         --  function $name($args)
+  --         --    $body
+  --         --  end
+  --         --
+  --         -- <c-l> will move you to the right of each of the expansion locations.
+  --         -- <c-h> is similar, except moving you backwards.
+  --         ['<C-l>'] = cmp.mapping(function()
+  --           if luasnip.expand_or_locally_jumpable() then
+  --             luasnip.expand_or_jump()
+  --           end
+  --         end, { 'i', 's' }),
+  --         ['<C-h>'] = cmp.mapping(function()
+  --           if luasnip.locally_jumpable(-1) then
+  --             luasnip.jump(-1)
+  --           end
+  --         end, { 'i', 's' }),
+  --
+  --         -- For more advanced Luasnip keymaps (e.g. selecting choice nodes, expansion) see:
+  --         --    https://github.com/L3MON4D3/LuaSnip?tab=readme-ov-file#keymaps
+  --       },
+  --       sources = {
+  --         {
+  --           name = 'lazydev',
+  --           -- set group index to 0 to skip loading LuaLS completions as lazydev recommends it
+  --           group_index = 0,
+  --         },
+  --         { name = 'nvim_lsp' },
+  --         { name = 'luasnip' },
+  --         { name = 'path' },
+  --       },
+  --     }
+  --   end,
+  -- },
+  {
     'rebelot/kanagawa.nvim',
     priority = 1000, -- Make sure to load this before all the other start plugins.
     opts = {
@@ -635,20 +849,53 @@ require('lazy').setup({
       -- Simple and easy statusline.
       --  You could remove this setup call if you don't like it,
       --  and try some other statusline plugin
-      local statusline = require 'mini.statusline'
-      -- set use_icons to true if you have a Nerd Font
-      statusline.setup { use_icons = vim.g.have_nerd_font }
+      -- local statusline = require 'mini.statusline'
+      -- -- -- set use_icons to true if you have a Nerd Font
+      -- statusline.setup { use_icons = vim.g.have_nerd_font }
+      -- --
+      -- -- -- You can configure sections in the statusline by overriding their
+      -- -- -- default behavior. For example, here we set the section for
+      -- -- -- cursor location to LINE:COLUMN
+      -- -- ---@diagnostic disable-next-line: duplicate-set-field
+      -- statusline.section_location = function()
+      --   return '%2l:%-2v'
+      -- end
 
-      -- You can configure sections in the statusline by overriding their
-      -- default behavior. For example, here we set the section for
-      -- cursor location to LINE:COLUMN
-      ---@diagnostic disable-next-line: duplicate-set-field
-      statusline.section_location = function()
-        return '%2l:%-2v'
-      end
-
-      -- ... and there is more!
-      --  Check out: https://github.com/echasnovski/mini.nvim
+      require('mini.notify').setup {
+        lsp_progress = { duration = 2000 },
+      }
+    end,
+  },
+  {
+    'nvim-lualine/lualine.nvim',
+    dependencies = { 'nvim-tree/nvim-web-devicons' },
+    config = function()
+      require('lualine').setup {
+        options = {
+          component_separators = { left = '', right = '' },
+          section_separators = { left = '', right = '' },
+          -- refresh = {
+          --   statusline = 65,
+          --   tabline = 65,
+          --   winbar = 65,
+          -- },
+        },
+        sections = {
+          lualine_a = {
+            {
+              'mode',
+              fmt = function(str)
+                return str:sub(1, 1)
+              end,
+            },
+          },
+          lualine_b = { 'branch', 'diff', 'diagnostics' },
+          lualine_c = { 'filename' },
+          lualine_x = { 'filetype' },
+          lualine_y = { 'progress' },
+          lualine_z = { 'location' },
+        },
+      }
     end,
   },
   {
@@ -704,6 +951,7 @@ require('lazy').setup({
         --  If you are experiencing weird indenting issues, add the language to
         --  the list of additional_vim_regex_highlighting and disabled languages for indent.
         additional_vim_regex_highlighting = { 'ruby' },
+        disable = { 'latex' },
       },
       indent = { enable = true, disable = { 'ruby' } },
     },
@@ -732,6 +980,15 @@ require('lazy').setup({
       'RainbowDelimQuoted',
       'RainbowMultiDelim',
     },
+  },
+  {
+    'MeanderingProgrammer/render-markdown.nvim',
+    dependencies = { 'nvim-treesitter/nvim-treesitter', 'echasnovski/mini.nvim' }, -- if you use the mini.nvim suite
+    -- dependencies = { 'nvim-treesitter/nvim-treesitter', 'echasnovski/mini.icons' }, -- if you use standalone mini plugins
+    -- dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-tree/nvim-web-devicons' }, -- if you prefer nvim-web-devicons
+    ---@module 'render-markdown'
+    ---@type render.md.UserConfig
+    opts = {},
   },
 }, {
   ui = {},
