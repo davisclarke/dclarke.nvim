@@ -4,7 +4,8 @@ vim.g.have_nerd_font = true
 
 -- Backround
 -- Controlled by theme swticher script in /home/davisc/.config/sway
--- vim.opt.background = 'light'
+-- Ignore any changes to the line below
+vim.opt.background = 'dark'
 
 -- Conceal level
 vim.opt.conceallevel = 1
@@ -20,7 +21,7 @@ vim.opt.numberwidth = 2
 vim.opt.redrawtime = 100
 -- vim.opt.cmdheight = 0
 -- Enable mouse mode, can be useful for resizing splits for example!
--- vim.opt.mouse = 'a'
+-- vim.opt.mouse = ''
 
 -- Don't show the mode, since it's already in the status line
 vim.opt.showmode = false
@@ -298,6 +299,9 @@ require('lazy').setup({
         winblend = 0,
       },
     },
+    config = function()
+      vim.keymap.set('n', '<leader>n', '<cmd>Neotree<CR>')
+    end,
   },
   -- LSP Plugins
   {
@@ -320,21 +324,34 @@ require('lazy').setup({
     -- install jsregexp (optional!).
     build = 'make install_jsregexp',
   },
+  -- {
+  --   'lervag/vimtex',
+  --   lazy = false, -- lazy-loading will disable inverse search
+  --   config = function()
+  --     vim.g.vimtex_mappings_disable = { ['n'] = { 'K' } } -- disable `K` as it conflicts with LSP hover
+  --     vim.g.vimtex_quickfix_method = vim.fn.executable 'pplatex' == 1 and 'pplatex' or 'latexlog'
+  --   end,
+  --   init = function()
+  --     -- VimTeX configuration goes here, e.g.
+  --     vim.g.vimtex_view_method = 'zathura'
+  --   end,
+  --   keys = {
+  --     { '<localLeader>l', '', desc = '+vimtex', ft = 'tex' },
+  --   },
+  -- },
   {
-    'lervag/vimtex',
-    lazy = false, -- lazy-loading will disable inverse search
-    config = function()
-      vim.g.vimtex_mappings_disable = { ['n'] = { 'K' } } -- disable `K` as it conflicts with LSP hover
-      vim.g.vimtex_quickfix_method = vim.fn.executable 'pplatex' == 1 and 'pplatex' or 'latexlog'
-    end,
-    init = function()
-      -- VimTeX configuration goes here, e.g.
-      vim.g.vimtex_view_method = 'zathura'
-    end,
-    keys = {
-      { '<localLeader>l', '', desc = '+vimtex', ft = 'tex' },
+    'j-hui/fidget.nvim',
+    tag = 'v1.0.0', -- Make sure to update this to something recent!
+    opts = {
+      notification = { -- NOTE: you're missing this outer table
+        window = {
+          winblend = 0, -- NOTE: it's winblend, not blend
+        },
+      },
     },
   },
+  -- {
+  --
   {
     -- Main LSP Configuration
     'neovim/nvim-lspconfig',
@@ -440,7 +457,7 @@ require('lazy').setup({
           if client and client.supports_method(vim.lsp.protocol.Methods.textDocument_inlayHint) then
             map('<leader>th', function()
               vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled { bufnr = event.buf })
-            end, '[t]oggle inlay [h]ints')
+            end, 'Toggle inlay [h]ints')
           end
         end,
       })
@@ -586,99 +603,56 @@ require('lazy').setup({
     },
   },
   -- lazy.nvim
-  {
-    'folke/noice.nvim',
-    event = 'VeryLazy',
-    -- opts = {
-    --   -- add any options here
-    -- },
-    dependencies = {
-      -- if you lazy-load any plugin below, make sure to add proper `module="..."` entries
-      'MunifTanjim/nui.nvim',
-      -- OPTIONAL:
-      --   `nvim-notify` is only needed, if you want to use the notification view.
-      --   If not available, we use `mini` as the fallback
-      -- 'rcarriga/nvim-notify',
-    },
-
-    config = function()
-      require('noice').setup {
-        lsp = {
-          -- override markdown rendering so that **cmp** and other plugins use **Treesitter**
-          override = {
-            ['vim.lsp.util.convert_input_to_markdown_lines'] = true,
-            ['vim.lsp.util.stylize_markdown'] = true,
-            ['cmp.entry.get_documentation'] = true, -- requires hrsh7th/nvim-cmp
-          },
-        },
-        -- you can enable a preset for easier configuration
-        presets = {
-          bottom_search = true, -- use a classic bottom cmdline for search
-          command_palette = true, -- position the cmdline and popupmenu together
-          long_message_to_split = true, -- long messages will be sent to a split
-          inc_rename = false, -- enables an input dialog for inc-rename.nvim
-          lsp_doc_border = false, -- add a border to hover docs and signature help
-        },
-        cmdline = {
-          view = 'cmdline',
-        },
-        views = {
-          cmdline_popup = {
-            border = {
-              style = 'none',
-            },
-          },
-          popup = {
-            border = {
-              style = 'none',
-            },
-          },
-        },
-      }
-    end,
-  },
-  -- Make noice less obtrusive
-  -- Blink.cmp is cool, but needs a little more time.
   -- {
-  --   'saghen/blink.cmp',
-  --   -- optional: provides snippets for the snippet source
-  --   dependencies = 'rafamadriz/friendly-snippets',
-  --
-  --   -- use a release tag to download pre-built binaries
-  --   version = '*',
-  --   -- AND/OR build from source, requires nightly: https://rust-lang.github.io/rustup/concepts/channels.html#working-with-nightly-rust
-  --   -- build = 'cargo build --release',
-  --   -- If you use nix, you can build from source using latest nightly rust with:
-  --   -- build = 'nix run .#build-plugin',
-  --
-  --   ---@module 'blink.cmp'
-  --   ---@type blink.cmp.Config
-  --   opts = {
-  --     -- 'default' for mappings similar to built-in completion
-  --     -- 'super-tab' for mappings similar to vscode (tab to accept, arrow keys to navigate)
-  --     -- 'enter' for mappings similar to 'super-tab' but with 'enter' to accept
-  --     -- See the full "keymap" documentation for information on defining your own keymap.
-  --     keymap = { preset = 'default' },
-  --
-  --     appearance = {
-  --       -- Sets the fallback highlight groups to nvim-cmp's highlight groups
-  --       -- Useful for when your theme doesn't support blink.cmp
-  --       -- Will be removed in a future release
-  --       use_nvim_cmp_as_default = true,
-  --       -- Set to 'mono' for 'Nerd Font Mono' or 'normal' for 'Nerd Font'
-  --       -- Adjusts spacing to ensure icons are aligned
-  --       nerd_font_variant = 'mono',
-  --     },
-  --     -- Default list of enabled providers defined so that you can extend it
-  --     -- elsewhere in your config, without redefining it, due to `opts_extend`
-  --     sources = {
-  --       default = { 'lsp', 'path', 'snippets', 'buffer' },
-  --     },
+  --   'folke/noice.nvim',
+  --   event = 'VeryLazy',
+  --   -- opts = {
+  --   --   -- add any options here
+  --   -- },
+  --   dependencies = {
+  --     -- if you lazy-load any plugin below, make sure to add proper `module="..."` entries
+  --     'MunifTanjim/nui.nvim',
+  --     -- OPTIONAL:
+  --     --   `nvim-notify` is only needed, if you want to use the notification view.
+  --     --   If not available, we use `mini` as the fallback
+  --     -- 'rcarriga/nvim-notify',
   --   },
-  --   completion = {
-  --     list = { selection = { preselect = false, auto_insert = true }, ghost_text = { enabled = true } },
-  --   },
-  --   opts_extend = { 'sources.default' },
+  --
+  --   config = function()
+  --     require('noice').setup {
+  --       lsp = {
+  --         override = {
+  --           ['vim.lsp.util.convert_input_to_markdown_lines'] = true,
+  --           ['vim.lsp.util.stylize_markdown'] = true,
+  --           ['cmp.entry.get_documentation'] = true, -- requires hrsh7th/nvim-cmp
+  --         },
+  --       },
+  --       -- you can enable a preset for easier configuration
+  --       presets = {
+  --         bottom_search = true, -- use a classic bottom cmdline for search
+  --         -- command_palette = true, -- position the cmdline and popupmenu together
+  --         long_message_to_split = true, -- long messages will be sent to a split
+  --         inc_rename = false, -- enables an input dialog for inc-rename.nvim
+  --         lsp_doc_border = false, -- add a border to hover docs and signature help
+  --       },
+  --       cmdline = { enabled = false },
+  --       -- views = {
+  --       --   mini = {
+  --       --     win_options = { winblend = 0 },
+  --       --   },
+  --       --   cmdline_popup = {
+  --       --     border = {
+  --       --       style = 'single',
+  --       --     },
+  --       --   },
+  --       --   popup = {
+  --       --     border = {
+  --       --       style = 'none',
+  --       --     },
+  --       --   },
+  --       -- },
+  --     }
+  --   end,
   -- },
   { -- Autocompletion
     'hrsh7th/nvim-cmp',
@@ -704,6 +678,12 @@ require('lazy').setup({
             'rafamadriz/friendly-snippets',
             config = function()
               require('luasnip.loaders.from_vscode').lazy_load()
+            end,
+          },
+          {
+            'gitaarik/nvim-cmp-toggle',
+            config = function()
+              vim.api.nvim_set_keymap('n', '<Leader>tc', ':NvimCmpToggle<CR>', { noremap = true, silent = true, desc = 'Toggle [c]ompletions' })
             end,
           },
         },
@@ -801,9 +781,9 @@ require('lazy').setup({
           { name = 'cmp-cmdline' },
           { name = 'cmp-buffer' },
         },
-        view = {
-          entries = { name = 'custom', selection_order = 'near_cursor' },
-        },
+        -- view = {
+        --   entries = { name = 'custom', selection_order = 'near_cursor' },
+        -- },
       }
 
       -- `/` cmdline setup.
@@ -833,17 +813,7 @@ require('lazy').setup({
     priority = 1000, -- Make sure to load this before all the other start plugins.
     lazy = false,
     opts = {
-      transparent = false,
-
-      colors = {
-        theme = {
-          all = {
-            ui = {
-              bg_gutter = 'none',
-            },
-          },
-        },
-      },
+      transparent = true,
     },
     init = function()
       -- Load the colorscheme here.
@@ -895,9 +865,37 @@ require('lazy').setup({
       -- - sd'   - [S]urround [D]elete [']quotes
       -- - sr)'  - [S]urround [R]eplace [)] [']
       require('mini.surround').setup()
-
-      require('mini.notify').setup {
-        lsp_progress = { duration = 2000 },
+      --
+      -- require('mini.notify').setup {
+      --   lsp_progress = { duration = 2000 },
+      --   window = { winblend = 100 },
+      -- }
+    end,
+  },
+  {
+    'akinsho/bufferline.nvim',
+    version = '*',
+    dependencies = 'nvim-tree/nvim-web-devicons',
+    init = function()
+      vim.opt.termguicolors = true
+      require('bufferline').setup {
+        options = {
+          hover = {
+            enabled = true,
+            delay = 200,
+            reveal = { 'close' },
+          },
+          show_buffer_close_icons = false,
+          show_close_icon = false,
+          indicator = { style = 'none' },
+          -- auto_toggle_bufferline = true,
+          always_show_bufferline = false,
+          -- custom_filter = function(buf_number, buf_numbers)
+          --   if buf_numbers[1] ~= buf_number then
+          --     return true
+          --   end
+          -- end,
+        },
       }
     end,
   },
@@ -908,7 +906,6 @@ require('lazy').setup({
       require('lualine').setup {
         options = {
           component_separators = { left = '', right = '' },
-          -- section_separators = { left = '', right = '' },
           section_separators = { left = '', right = '' },
           refresh = {
             statusline = 65,
@@ -964,6 +961,7 @@ require('lazy').setup({
           { icon = "", key = "f", desc = "Find File", action = ":lua Snacks.dashboard.pick('files')" },
           { icon = "", key = "g", desc = "Grep", action = ":lua Snacks.dashboard.pick('live_grep')" },
           { icon = "", key = "c", desc = "Config", action = ":e /home/davisc/.config/nvim/init.lua" },
+          { icon = " ", key = "n", desc = "New File", action = ":ene | startinsert" },
           { icon = "󰒲", key = "l", desc = "Lazy", action = ":Lazy" },
           { icon = "󰢛", key = "m", desc = "Mason", action = ":Mason" },
           { icon = " ", key = "q", desc = "Quit", action = ":qa" },
@@ -1031,6 +1029,7 @@ require('lazy').setup({
     --   "BufReadPre path/to/my-vault/*.md",
     --   "BufNewFile path/to/my-vault/*.md",
     -- },
+    --
     dependencies = {
       -- Required.
       'nvim-lua/plenary.nvim',
@@ -1042,9 +1041,49 @@ require('lazy').setup({
         {
           name = 'agenda',
           path = '~/agenda',
+          overrides = {
+            disable_frontmatter = true,
+          },
+        },
+        {
+          name = 'no-vault',
+          path = function()
+            -- alternatively use the CWD:
+            -- return assert(vim.fn.getcwd())
+            return assert(vim.fs.dirname(vim.api.nvim_buf_get_name(0)))
+          end,
+          overrides = {
+            notes_subdir = vim.NIL, -- have to use 'vim.NIL' instead of 'nil'
+            new_notes_location = 'current_dir',
+            templates = {
+              folder = vim.NIL,
+            },
+            disable_frontmatter = true,
+          },
+        },
+      },
+      ui = {
+        checkboxes = {
+          [' '] = { char = '󰄱', hl_group = 'ObsidianTodo' },
+          ['x'] = { char = '', hl_group = 'ObsidianDone' },
         },
       },
     },
+  },
+
+  {
+    'NeogitOrg/neogit',
+    dependencies = {
+      'nvim-lua/plenary.nvim', -- required
+      'sindrets/diffview.nvim', -- optional - Diff integration
+
+      -- Only one of these is needed.
+      'ibhagwan/fzf-lua', -- optional
+    },
+    config = true,
+    init = function()
+      vim.keymap.set('n', '<space>g', ':Neogit<cr>', { desc = 'Neo[g]it' })
+    end,
   },
   -- {
   --   'MeanderingProgrammer/render-markdown.nvim',
