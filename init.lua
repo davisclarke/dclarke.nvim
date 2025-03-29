@@ -5,7 +5,7 @@ vim.g.have_nerd_font = true
 -- Backround
 -- Controlled by theme swticher script in /home/davisc/.config/sway
 -- Ignore any changes to the line below
-vim.opt.background = 'dark'
+vim.opt.background = 'light'
 
 -- Conceal level
 vim.opt.conceallevel = 1
@@ -67,7 +67,7 @@ vim.opt.listchars = { tab = '» ', trail = '·', nbsp = '␣' }
 vim.opt.inccommand = 'split'
 
 -- Show which line your cursor is on
-vim.opt.cursorline = true
+-- vim.opt.cursorline = true
 
 -- Minimal number of screen lines to keep above and below the cursor.
 vim.opt.scrolloff = 10
@@ -373,11 +373,6 @@ require('lazy').setup({
       vim.api.nvim_create_autocmd('LspAttach', {
         group = vim.api.nvim_create_augroup('kickstart-lsp-attach', { clear = true }),
         callback = function(event)
-          -- NOTE: Remember that Lua is a real programming language, and as such it is possible
-          -- to define small helper and utility functions so you don't have to repeat yourself.
-          --
-          -- In this case, we create a function that lets us more easily define mappings specific
-          -- for LSP related items. It sets the mode, buffer and description for us each time.
           local map = function(keys, func, desc, mode)
             mode = mode or 'n'
             vim.keymap.set(mode, keys, func, { buffer = event.buf, desc = 'LSP: ' .. desc })
@@ -808,43 +803,70 @@ require('lazy').setup({
       })
     end,
   },
+  -- {
+  --   'sainnhe/everforest',
+  --   lazy = false,
+  --   priority = 1000,
+  --   config = function()
+  --     -- Optionally configure and load the colorscheme
+  --     -- directly inside the plugin declaration.
+  --     vim.g.everforest_enable_italic = false
+  --     vim.cmd.colorscheme 'everforest'
+  --   end,
+  -- },
   {
-    'rebelot/kanagawa.nvim',
-    priority = 1000, -- Make sure to load this before all the other start plugins.
+    'zenbones-theme/zenbones.nvim',
+    -- Optionally install Lush. Allows for more configuration or extending the colorscheme
+    -- If you don't want to install lush, make sure to set g:zenbones_compat = 1
+    -- In Vim, compat mode is turned on as Lush only works in Neovim.
+    dependencies = 'rktjmp/lush.nvim',
     lazy = false,
-    opts = {
-      transparent = true,
-    },
-    init = function()
-      -- Load the colorscheme here.
-      vim.cmd.colorscheme 'kanagawa'
-
-      -- You can configure highlights by doing something like:
-      vim.cmd.hi 'Comment gui=none'
-      -- vim.cmd.hi 'WinSeparator guifg=#727169'
-      -- vim.cmd 'hi
-    end,
-    overrides = function(colors)
-      local theme = colors.theme
-      return {
-        NormalFloat = { bg = 'none' },
-        FloatBorder = { bg = 'none' },
-        FloatTitle = { bg = 'none' },
-
-        -- Save an hlgroup with dark background and dimmed foreground
-        -- so that you can use it where your still want darker windows.
-        -- E.g.: autocmd TermOpen * setlocal winhighlight=Normal:NormalDark
-        NormalDark = { fg = theme.ui.fg_dim, bg = theme.ui.bg_m3 },
-
-        -- Popular plugins that open floats will link to NormalFloat by default;
-        -- set their background accordingly if you wish to keep them dark and borderless
-        LazyNormal = { bg = theme.ui.bg_m3, fg = theme.ui.fg_dim },
-        MasonNormal = { bg = theme.ui.bg_m3, fg = theme.ui.fg_dim },
-
-        -- WinSeparator = { fg = theme.ui.nontext }, -- Brighter win seps
-      }
+    priority = 1000,
+    -- you can set set configuration options here
+    config = function()
+      -- vim.g.zenbones_darken_comments = 45
+      vim.g.zenwritten = { italic_comments = false }
+      vim.cmd.colorscheme 'zenwritten'
     end,
   },
+  -- {
+  --   'rebelot/kanagawa.nvim',
+  --   priority = 1000, -- Make sure to load this before all the other start plugins.
+  --   lazy = false,
+  --   opts = {
+  --     transparent = true,
+  --     colors = { theme = { all = { ui = { bg_gutter = 'none' } } } },
+  --   },
+  --   init = function()
+  --     -- Load the colorscheme here.
+  --     vim.cmd.colorscheme 'kanagawa'
+  --
+  --     -- You can configure highlights by doing something like:
+  --     vim.cmd.hi 'Comment gui=none'
+  --     -- vim.cmd.hi 'WinSeparator guifg=#727169'
+  --     -- vim.cmd 'hi
+  --   end,
+  --   overrides = function(colors)
+  --     local theme = colors.theme
+  --     return {
+  --       NormalFloat = { bg = 'none' },
+  --       FloatBorder = { bg = 'none' },
+  --       FloatTitle = { bg = 'none' },
+  --
+  --       -- Save an hlgroup with dark background and dimmed foreground
+  --       -- so that you can use it where your still want darker windows.
+  --       -- E.g.: autocmd TermOpen * setlocal winhighlight=Normal:NormalDark
+  --       NormalDark = { fg = theme.ui.fg_dim, bg = theme.ui.bg_m3 },
+  --
+  --       -- Popular plugins that open floats will link to NormalFloat by default;
+  --       -- set their background accordingly if you wish to keep them dark and borderless
+  --       LazyNormal = { bg = theme.ui.bg_m3, fg = theme.ui.fg_dim },
+  --       MasonNormal = { bg = theme.ui.bg_m3, fg = theme.ui.fg_dim },
+  --
+  --       -- WinSeparator = { fg = theme.ui.nontext }, -- Brighter win seps
+  --     }
+  --   end,
+  -- },
   -- Highlight todo, notes, etc in comments
   { 'folke/todo-comments.nvim', event = 'VimEnter', dependencies = { 'nvim-lua/plenary.nvim' }, opts = { signs = false } },
 
@@ -1015,7 +1037,25 @@ require('lazy').setup({
       'RainbowMultiDelim',
     },
   },
-  { 'mrjones2014/smart-splits.nvim' },
+  {
+    'mrjones2014/smart-splits.nvim',
+    lazy = false,
+    init = function()
+      require('smart-splits').setup {
+        resize_mode = {
+          silent = true,
+          hooks = {
+            on_enter = function()
+              vim.notify 'Entering resize mode'
+            end,
+            on_leave = function()
+              vim.notify 'Exiting resize mode, bye'
+            end,
+          },
+        },
+      }
+    end,
+  },
   {
     'epwalsh/obsidian.nvim',
     version = '*', -- recommended, use latest release instead of latest commit
