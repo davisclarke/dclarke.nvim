@@ -356,7 +356,7 @@ require('lazy').setup({
     -- Main LSP Configuration
     'neovim/nvim-lspconfig',
     dependencies = {
-      -- Automatically install LSPs and related tools to stdpath for Neovim
+      -- Automatically install LSPs and related tools toio stdpath for Neovim
       { 'williamboman/mason.nvim', config = true }, -- NOTE: Must be loaded before dependants
       'williamboman/mason-lspconfig.nvim',
       'WhoIsSethDaniel/mason-tool-installer.nvim',
@@ -803,70 +803,17 @@ require('lazy').setup({
       })
     end,
   },
-  -- {
-  --   'sainnhe/everforest',
-  --   lazy = false,
-  --   priority = 1000,
-  --   config = function()
-  --     -- Optionally configure and load the colorscheme
-  --     -- directly inside the plugin declaration.
-  --     vim.g.everforest_enable_italic = false
-  --     vim.cmd.colorscheme 'everforest'
-  --   end,
-  -- },
+  { 'rktjmp/shipwright.nvim' },
   {
-    'zenbones-theme/zenbones.nvim',
-    -- Optionally install Lush. Allows for more configuration or extending the colorscheme
-    -- If you don't want to install lush, make sure to set g:zenbones_compat = 1
-    -- In Vim, compat mode is turned on as Lush only works in Neovim.
+    'savq/melange-nvim',
+
     dependencies = 'rktjmp/lush.nvim',
-    lazy = false,
-    priority = 1000,
-    -- you can set set configuration options here
-    config = function()
-      -- vim.g.zenbones_darken_comments = 45
-      vim.g.zenwritten = { italic_comments = false }
-      vim.cmd.colorscheme 'zenwritten'
+    init = function()
+      vim.g.melange_enable_font_variants = 0 -- disable font variants
+      vim.opt.termguicolors = true
+      vim.cmd.colorscheme 'melange'
     end,
   },
-  -- {
-  --   'rebelot/kanagawa.nvim',
-  --   priority = 1000, -- Make sure to load this before all the other start plugins.
-  --   lazy = false,
-  --   opts = {
-  --     transparent = true,
-  --     colors = { theme = { all = { ui = { bg_gutter = 'none' } } } },
-  --   },
-  --   init = function()
-  --     -- Load the colorscheme here.
-  --     vim.cmd.colorscheme 'kanagawa'
-  --
-  --     -- You can configure highlights by doing something like:
-  --     vim.cmd.hi 'Comment gui=none'
-  --     -- vim.cmd.hi 'WinSeparator guifg=#727169'
-  --     -- vim.cmd 'hi
-  --   end,
-  --   overrides = function(colors)
-  --     local theme = colors.theme
-  --     return {
-  --       NormalFloat = { bg = 'none' },
-  --       FloatBorder = { bg = 'none' },
-  --       FloatTitle = { bg = 'none' },
-  --
-  --       -- Save an hlgroup with dark background and dimmed foreground
-  --       -- so that you can use it where your still want darker windows.
-  --       -- E.g.: autocmd TermOpen * setlocal winhighlight=Normal:NormalDark
-  --       NormalDark = { fg = theme.ui.fg_dim, bg = theme.ui.bg_m3 },
-  --
-  --       -- Popular plugins that open floats will link to NormalFloat by default;
-  --       -- set their background accordingly if you wish to keep them dark and borderless
-  --       LazyNormal = { bg = theme.ui.bg_m3, fg = theme.ui.fg_dim },
-  --       MasonNormal = { bg = theme.ui.bg_m3, fg = theme.ui.fg_dim },
-  --
-  --       -- WinSeparator = { fg = theme.ui.nontext }, -- Brighter win seps
-  --     }
-  --   end,
-  -- },
   -- Highlight todo, notes, etc in comments
   { 'folke/todo-comments.nvim', event = 'VimEnter', dependencies = { 'nvim-lua/plenary.nvim' }, opts = { signs = false } },
 
