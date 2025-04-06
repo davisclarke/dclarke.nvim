@@ -5,7 +5,7 @@ vim.g.have_nerd_font = true
 -- Backround
 -- Controlled by theme swticher script in /home/davisc/.config/sway
 -- Ignore any changes to the line below
-vim.opt.background = 'light'
+vim.opt.background = 'dark'
 
 -- Conceal level
 vim.opt.conceallevel = 1
