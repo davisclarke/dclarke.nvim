@@ -5,7 +5,7 @@ vim.g.have_nerd_font = true
 -- Backround
 -- Controlled by theme swticher script in /home/davisc/.config/sway
 -- Ignore any changes to the line below
-vim.opt.background = 'dark'
+vim.opt.background = 'light'
 
 -- Conceal level
 vim.opt.conceallevel = 1
@@ -26,6 +26,8 @@ vim.opt.redrawtime = 100
 -- Don't show the mode, since it's already in the status line
 vim.opt.showmode = false
 
+-- EOB
+vim.opt.fillchars = { eob = ' ' }
 -- Sync clipboard between OS and Neovim.
 --  Schedule the setting after `UiEnter` because it can increase startup-time.
 --  Remove this option if you want your OS clipboard to remain independent.
@@ -77,7 +79,7 @@ vim.keymap.set('n', ';', ':')
 vim.keymap.set('n', ':', ';')
 -- [[ Basic Keymaps ]]
 --  See `:help vim.keymap.set()`
-vim.keymap.set('n', '<leader>u', '<cmd>update<CR>')
+vim.keymap.set('n', '<leader>w', '<cmd>:update<CR>', { desc = '[w]rite (update)' })
 -- Clear highlights on search when pressing <Esc> in normal mode
 --  See `:help hlsearch`
 vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
@@ -85,6 +87,10 @@ vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
 -- Diagnostic keymaps
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
 
+-- Buffer keymaps
+vim.keymap.set('n', '<leader>bd', ':bd<CR>', { desc = '[d]elete buffer' })
+vim.keymap.set('n', '<leader>bn', ':]b<CR>', { desc = '[n]ext buffer' })
+vim.keymap.set('n', '<leader>bp', ':[b<CR>', { desc = '[p]revious buffer' })
 -- Exit terminal mode in the builtin terminal with a shortcut that is a bit easier
 -- for people to discover. Otherwise, you normally need to press <C-\><C-n>, which
 -- is not what someone will guess without a bit more experience.
@@ -105,10 +111,10 @@ vim.keymap.set('n', '<PageDown>', '<cmd>echo "Use <C-f> to move!!"<CR>')
 --  Use CTRL+<hjkl> to switch between windows
 --
 --  See `:help wincmd` for a list of all window commands
-vim.keymap.set('n', '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left window' })
-vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right window' })
-vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
-vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
+-- vim.keymap.set('n', '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left window' })
+-- vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right window' })
+-- vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
+-- vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
 
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`
@@ -124,6 +130,19 @@ vim.api.nvim_create_autocmd('TextYankPost', {
   end,
 })
 
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = { 'markdown' },
+  callback = function()
+    vim.schedule(function()
+      vim.keymap.set(
+        'n',
+        '<leader>G',
+        ":terminal git pull && git add . && git commit -m '`date`' && git push<CR> :bd<CR> :echo 'Done!'<CR> ",
+        { buffer = true, desc = 'Update [G]it' }
+      )
+    end)
+  end,
+})
 -- [[ Install `lazy.nvim` plugin manager ]]
 --    See `:help lazy.nvim.txt` or https://github.com/folke/lazy.nvim for more info
 local lazypath = vim.fn.stdpath 'data' .. '/lazy/lazy.nvim'
@@ -226,9 +245,10 @@ require('lazy').setup({
         { '<leader>d', group = '[d]ocument' },
         { '<leader>r', group = '[r]ename' },
         { '<leader>s', group = '[s]earch' },
-        { '<leader>w', group = '[w]orkspace' },
+        { '<leader>o', group = 'w[o]rkspace' },
         { '<leader>t', group = '[t]oggle' },
         { '<leader>h', group = 'git [h]unk', mode = { 'n', 'v' } },
+        { '<leader>b', group = '[b]uffer' },
       },
     },
   },
@@ -300,7 +320,7 @@ require('lazy').setup({
       },
     },
     config = function()
-      vim.keymap.set('n', '<leader>n', '<cmd>Neotree<CR>')
+      vim.keymap.set('n', '<leader>e', '<cmd>Neotree<CR>', { desc = 'Neotr[e]e' })
     end,
   },
   -- LSP Plugins
@@ -402,7 +422,7 @@ require('lazy').setup({
 
           -- fuzzy find all the symbols in your current workspace.
           --  similar to document symbols, except searches over your entire project.
-          map('<leader>ws', fzflua.lsp_live_workspace_symbols, '[w]orkspace [s]ymbols')
+          map('<leader>os', fzflua.lsp_live_workspace_symbols, 'w[o]rkspace [s]ymbols')
 
           -- rename the variable under your cursor.
           --  most language servers support renaming across files, etc.
@@ -966,6 +986,46 @@ require('lazy').setup({
     --    - Treesitter + textobjects: https://github.com/nvim-treesitter/nvim-treesitter-textobjects
   },
   {
+    'ThePrimeagen/harpoon',
+    branch = 'harpoon2',
+    dependencies = { 'nvim-lua/plenary.nvim' },
+    init = function()
+      local harpoon = require 'harpoon'
+
+      -- REQUIRED
+      harpoon:setup()
+      -- REQUIRED
+
+      vim.keymap.set('n', '<leader>a', function()
+        harpoon:list():add()
+      end, { desc = '[a]dd harpoon' })
+      vim.keymap.set('n', '<C-a>e', function()
+        harpoon.ui:toggle_quick_menu(harpoon:list())
+      end, { desc = '[e]numerate harpoons' })
+
+      vim.keymap.set('n', '<C-a>h', function()
+        harpoon:list():select(1)
+      end, { desc = 'harpoon 1' })
+      vim.keymap.set('n', '<C-a>j', function()
+        harpoon:list():select(2)
+      end, { desc = 'harpoon 2' })
+      vim.keymap.set('n', '<C-a>k', function()
+        harpoon:list():select(3)
+      end, { desc = 'harpoon 3' })
+      vim.keymap.set('n', '<C-a>l', function()
+        harpoon:list():select(4)
+      end, { desc = 'harpoon 4' })
+
+      -- Toggle previous & next buffers stored within Harpoon list
+      vim.keymap.set('n', '<C-a>p', function()
+        harpoon:list():prev()
+      end, { desc = 'harpoon [p]revious buffer' })
+      vim.keymap.set('n', '<C-a>n', function()
+        harpoon:list():next()
+      end, { desc = 'harpoon [n]ext buffer' })
+    end,
+  },
+  {
     'cameron-wags/rainbow_csv.nvim',
     config = true,
     ft = {
@@ -1036,8 +1096,8 @@ require('lazy').setup({
           name = 'no-vault',
           path = function()
             -- alternatively use the CWD:
-            -- return assert(vim.fn.getcwd())
-            return assert(vim.fs.dirname(vim.api.nvim_buf_get_name(0)))
+            return assert(vim.fn.getcwd())
+            -- return assert(vim.fs.dirname(vim.api.nvim_buf_get_name(0)))
           end,
           overrides = {
             notes_subdir = vim.NIL, -- have to use 'vim.NIL' instead of 'nil'
@@ -1069,6 +1129,9 @@ require('lazy').setup({
     },
     config = true,
     init = function()
+      -- local neogit = require 'neogit'
+      --
+      -- neogit.setup { status = {} }
       vim.keymap.set('n', '<space>g', ':Neogit<cr>', { desc = 'Neo[g]it' })
     end,
   },
