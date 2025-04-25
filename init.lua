@@ -325,6 +325,26 @@ require('lazy').setup({
   },
   -- LSP Plugins
   {
+    'mrcjkb/rustaceanvim',
+    version = '^6', -- Recommended
+    lazy = false, -- This plugin is already lazy
+    init = function()
+      local bufnr = vim.api.nvim_get_current_buf()
+      vim.keymap.set('n', '<leader>a', function()
+        vim.cmd.RustLsp 'codeAction' -- supports rust-analyzer's grouping
+        -- or vim.lsp.buf.codeAction() if you don't want grouping.
+      end, { silent = true, buffer = bufnr })
+      vim.keymap.set(
+        'n',
+        'K', -- Override Neovim's built-in hover keymap with rustaceanvim's hover actions
+        function()
+          vim.cmd.RustLsp { 'hover', 'actions' }
+        end,
+        { silent = true, buffer = bufnr }
+      )
+    end,
+  },
+  {
     -- `lazydev` configures Lua LSP for your Neovim config, runtime and plugins
     -- used for completion, annotations and signatures of Neovim apis
     'folke/lazydev.nvim',
@@ -509,7 +529,7 @@ require('lazy').setup({
         clangd = {},
         -- gopls = {},
         ruff = {},
-        rust_analyzer = {},
+        -- rust_analyzer = {}, -- No need as per rustaceanvim
         basedpyright = {
           settings = {
             basedpyright = {
@@ -559,7 +579,9 @@ require('lazy').setup({
         'stylua', -- Used to format Lua code
       })
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
-
+      require('mason-lspconfig').setup_handlers {
+        ['rust_analyzer'] = function() end,
+      }
       require('mason-lspconfig').setup {
         handlers = {
           function(server_name)
@@ -996,9 +1018,9 @@ require('lazy').setup({
       harpoon:setup()
       -- REQUIRED
 
-      vim.keymap.set('n', '<leader>a', function()
+      vim.keymap.set('n', '<leader>h', function()
         harpoon:list():add()
-      end, { desc = '[a]dd harpoon' })
+      end, { desc = 'add [h]arpoon' })
       vim.keymap.set('n', '<C-a>e', function()
         harpoon.ui:toggle_quick_menu(harpoon:list())
       end, { desc = '[e]numerate harpoons' })
