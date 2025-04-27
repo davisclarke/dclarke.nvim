@@ -5,7 +5,7 @@ vim.g.have_nerd_font = true
 -- Backround
 -- Controlled by theme swticher script in /home/davisc/.config/sway
 -- Ignore any changes to the line below
-vim.opt.background = 'light'
+vim.opt.background = 'dark'
 
 -- Conceal level
 vim.opt.conceallevel = 1
@@ -111,10 +111,10 @@ vim.keymap.set('n', '<PageDown>', '<cmd>echo "Use <C-f> to move!!"<CR>')
 --  Use CTRL+<hjkl> to switch between windows
 --
 --  See `:help wincmd` for a list of all window commands
--- vim.keymap.set('n', '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left window' })
--- vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right window' })
--- vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
--- vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
+vim.keymap.set('n', '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left window' })
+vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right window' })
+vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
+vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
 
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`
@@ -329,19 +329,26 @@ require('lazy').setup({
     version = '^6', -- Recommended
     lazy = false, -- This plugin is already lazy
     init = function()
-      local bufnr = vim.api.nvim_get_current_buf()
-      vim.keymap.set('n', '<leader>a', function()
-        vim.cmd.RustLsp 'codeAction' -- supports rust-analyzer's grouping
-        -- or vim.lsp.buf.codeAction() if you don't want grouping.
-      end, { silent = true, buffer = bufnr })
-      vim.keymap.set(
-        'n',
-        'K', -- Override Neovim's built-in hover keymap with rustaceanvim's hover actions
-        function()
-          vim.cmd.RustLsp { 'hover', 'actions' }
+      vim.api.nvim_create_autocmd('FileType', {
+        pattern = { 'rust' },
+        callback = function()
+          vim.schedule(function()
+            local bufnr = vim.api.nvim_get_current_buf()
+            vim.keymap.set('n', '<leader>a', function()
+              vim.cmd.RustLsp 'codeAction' -- supports rust-analyzer's grouping
+              -- or vim.lsp.buf.codeAction() if you don't want grouping.
+            end, { silent = true, buffer = bufnr })
+            vim.keymap.set(
+              'n',
+              'K', -- Override Neovim's built-in hover keymap with rustaceanvim's hover actions
+              function()
+                vim.cmd.RustLsp { 'hover', 'actions' }
+              end,
+              { silent = true, buffer = bufnr }
+            )
+          end)
         end,
-        { silent = true, buffer = bufnr }
-      )
+      })
     end,
   },
   {
@@ -529,7 +536,7 @@ require('lazy').setup({
         clangd = {},
         -- gopls = {},
         ruff = {},
-        -- rust_analyzer = {}, -- No need as per rustaceanvim
+        rust_analyzer = { enabled = false }, -- No need as per rustacean
         basedpyright = {
           settings = {
             basedpyright = {
