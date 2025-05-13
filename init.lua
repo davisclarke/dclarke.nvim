@@ -89,8 +89,8 @@ vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagn
 
 -- Buffer keymaps
 vim.keymap.set('n', '<leader>bd', ':bd<CR>', { desc = '[d]elete buffer' })
-vim.keymap.set('n', '<leader>bn', ':]b<CR>', { desc = '[n]ext buffer' })
-vim.keymap.set('n', '<leader>bp', ':[b<CR>', { desc = '[p]revious buffer' })
+vim.keymap.set('n', '<leader>bn', ']b', { desc = '[n]ext buffer' })
+vim.keymap.set('n', '<leader>bp', '[b', { desc = '[p]revious buffer' })
 -- Exit terminal mode in the builtin terminal with a shortcut that is a bit easier
 -- for people to discover. Otherwise, you normally need to press <C-\><C-n>, which
 -- is not what someone will guess without a bit more experience.
@@ -130,6 +130,7 @@ vim.api.nvim_create_autocmd('TextYankPost', {
   end,
 })
 
+-- Auto-update markdown
 vim.api.nvim_create_autocmd('FileType', {
   pattern = { 'markdown' },
   callback = function()
@@ -143,6 +144,16 @@ vim.api.nvim_create_autocmd('FileType', {
     end)
   end,
 })
+
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = { 'tex' },
+  callback = function()
+    vim.schedule(function()
+      vim.keymap.set('n', '<leader>w', ':w<CR>:LspTexlabBuild<CR>', { buffer = true, desc = '[w]rite (update) and build' })
+    end)
+  end,
+})
+
 -- [[ Install `lazy.nvim` plugin manager ]]
 --    See `:help lazy.nvim.txt` or https://github.com/folke/lazy.nvim for more info
 local lazypath = vim.fn.stdpath 'data' .. '/lazy/lazy.nvim'
@@ -536,7 +547,7 @@ require('lazy').setup({
         clangd = {},
         -- gopls = {},
         ruff = {},
-        rust_analyzer = { enabled = false }, -- No need as per rustacean
+        -- rust_analyzer = { enabled = false }, -- No need as per rustacean
         basedpyright = {
           settings = {
             basedpyright = {
@@ -586,9 +597,7 @@ require('lazy').setup({
         'stylua', -- Used to format Lua code
       })
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
-      require('mason-lspconfig').setup_handlers {
-        ['rust_analyzer'] = function() end,
-      }
+
       require('mason-lspconfig').setup {
         handlers = {
           function(server_name)
@@ -960,8 +969,8 @@ require('lazy').setup({
         enabled = true,
         -- Maybe later
         preset = {
+          -- header = [[
           header = [[
-
  ________  ___       ___               ________  ________  ________  ________          
 |\   __  \|\  \     |\  \             |\   ____\|\   __  \|\   __  \|\   ____\         
 \ \  \|\  \ \  \    \ \  \            \ \  \___|\ \  \|\  \ \  \|\  \ \  \___|_        
@@ -969,7 +978,6 @@ require('lazy').setup({
   \ \  \ \  \ \  \____\ \  \____        \ \  \____\ \  \ \  \ \  \___|\|____|\  \  ___ 
    \ \__\ \__\ \_______\ \_______\       \ \_______\ \__\ \__\ \__\     ____\_\  \|\__\
     \|__|\|__|\|_______|\|_______|        \|_______|\|__|\|__|\|__|    |\_________\|__|
-
  ]],
         -- stylua: ignore
         ---@type snacks.dashboard.Item[]
