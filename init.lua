@@ -148,8 +148,8 @@ vim.api.nvim_create_autocmd('FileType', {
         'n',
         '<leader>w',
         -- ":terminal git pull && git add . && git commit -m '`date`' && git push<CR>! :bd<CR> :echo 'Done!'<CR> ",
-        ':w<CR>:GitAutoCommitPush<CR>',
-        { buffer = true, desc = '[w]rite (update) with git push', noremap = true }
+        ':wa<CR>:GitAutoCommitPush<CR>',
+        { buffer = true, desc = '[w]rite all with git commit/push', noremap = true }
       )
     end)
   end,
@@ -695,23 +695,64 @@ require('lazy').setup({
   },
   -- lazy.nvim
   { 'rktjmp/shipwright.nvim' },
+  -- {
+  --   'scottmckendry/cyberdream.nvim',
+  --   lazy = false,
+  --   priority = 1000,
+  --   opts = { colors = { dark = { bg = '#000000' } }, extensions = { lualine = false } },
+  --   init = function()
+  --     vim.cmd 'colorscheme cyberdream'
+  --     -- The event data property will contain a string with either "default" or "light" respectively
+  --   end,
+  -- },
+  -- `lazy` and `priority` are only needed if this is your primary colorscheme to load it first
   {
-    'wtfox/jellybeans.nvim',
-    lazy = false,
-    priority = 1000,
+    'rebelot/kanagawa.nvim',
     opts = {
-      -- plugins = { auto = false },
-      italics = false,
-      on_colors = function(c)
-        local light_bg = '#f9f9f9' -- Change the default light bg
-        local dark_bg = '#151515'
-        c.background = vim.o.background == 'light' and light_bg or dark_bg
+      colors = {
+        pallete = {
+          -- change all usages of these colors
+          sumiInk0 = '#000000',
+          fujiWhite = '#FFFFFF',
+        },
+        {
+          theme = {
+            all = {
+              ui = {
+                bg_gutter = 'none',
+              },
+            },
+          },
+        },
+      },
+    }
+      init = function()
+        vim.cmd [[colorscheme kanagawa-dragon]]
       end,
-    },
-    init = function()
-      vim.cmd [[colorscheme jellybeans ]]
-    end,
   },
+
+  -- {
+  --   'wtfox/jellybeans.nvim',
+  --   lazy = false,
+  --   priority = 1000,
+  --   opts = {
+  --     -- plugins = { auto = false },
+  --     italics = false,
+  --     on_colors = function(c)
+  --       local light_bg = '#ffffff' -- Change the default light bg
+  --       local dark_bg = '#0c0c0c'
+  --       c.background = vim.o.background == 'light' and light_bg or dark_bg
+  --     end,
+  --   },
+  --   init = function()
+  --     vim.cmd [[colorscheme jellybeans ]]
+  --   end,
+  -- },
+  -- {
+  --   'rktjmp/lush.nvim',
+  --   -- if you wish to use your own colorscheme:
+  --   -- { dir = '/absolute/path/to/colorscheme', lazy = true },
+  -- },
   -- {
   --   'savq/melange-nvim',
   --
