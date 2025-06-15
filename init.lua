@@ -1,7 +1,6 @@
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 vim.g.have_nerd_font = true
-
 -- Backround
 -- Controlled by theme swticher script in /home/davisc/.config/sway
 -- Ignore any changes to the line below
@@ -696,17 +695,41 @@ require('lazy').setup({
   -- lazy.nvim
   { 'rktjmp/shipwright.nvim' },
   -- {
-  --   'scottmckendry/cyberdream.nvim',
-  --   lazy = false,
-  --   priority = 1000,
-  --   opts = { colors = { dark = { bg = '#000000' } }, extensions = { lualine = false } },
-  --   init = function()
-  --     vim.cmd 'colorscheme cyberdream'
-  --     -- The event data property will contain a string with either "default" or "light" respectively
+  --   'ramojus/mellifluous.nvim',
+  --   -- version = "v0.*", -- uncomment for stable config (some features might be missed if/when v1 comes out)
+  --   config = function()
+  --     require('mellifluous').setup {} -- optional, see configuration section.
+  --     vim.cmd 'colorscheme mellifluous'
   --   end,
   -- },
-  -- `lazy` and `priority` are only needed if this is your primary colorscheme to load it first
-
+  {
+    'aktersnurra/no-clown-fiesta.nvim',
+    priority = 1000,
+    lazy = false,
+    init = function()
+      vim.cmd [[colorscheme no-clown-fiesta]]
+    end,
+  },
+  -- {
+  --   'savq/melange-nvim',
+  --   lazy = false,
+  --   priority = 1000,
+  --   init = function()
+  --     local group = vim.api.nvim_create_augroup('OverrideMelange', {})
+  --     vim.api.nvim_create_autocmd('ColorScheme', {
+  --       pattern = 'melange',
+  --       callback = function()
+  --         if vim.o.background == 'dark' then
+  --           vim.api.nvim_set_hl(0, 'Normal', { bg = '#151515' })
+  --         else
+  --           vim.api.nvim_set_hl(0, 'Normal', { bg = '#f9f9f9' })
+  --         end
+  --       end,
+  --       group = group,
+  --     })
+  --     vim.cmd [[colorscheme melange]]
+  --   end,
+  -- },
   -- {
   --   'wtfox/jellybeans.nvim',
   --   lazy = false,
@@ -715,28 +738,16 @@ require('lazy').setup({
   --     -- plugins = { auto = false },
   --     italics = false,
   --     on_colors = function(c)
-  --       local light_bg = '#ffffff' -- Change the default light bg
-  --       local dark_bg = '#0c0c0c'
+  --       local light_bg = '#f9f9f9' -- Change the default light bg
+  --       local dark_bg = '#060606'
+  --       local light_fg = '#000000'
+  --       local dark_fg = '#e8e8e8'
   --       c.background = vim.o.background == 'light' and light_bg or dark_bg
+  --       c.foreground = vim.o.background == 'light' and light_fg or dark_fg
   --     end,
   --   },
   --   init = function()
   --     vim.cmd [[colorscheme jellybeans ]]
-  --   end,
-  -- },
-  -- {
-  --   'rktjmp/lush.nvim',
-  --   -- if you wish to use your own colorscheme:
-  --   -- { dir = '/absolute/path/to/colorscheme', lazy = true },
-  -- },
-  -- {
-  --   'savq/melange-nvim',
-  --
-  --   dependencies = 'rktjmp/lush.nvim',
-  --   init = function()
-  --     -- vim.g.melange_enable_font_variants = 0 -- disable font variants
-  --     vim.opt.termguicolors = true
-  --     vim.cmd.colorscheme 'melange'
   --   end,
   -- },
   -- Highlight todo, notes, etc in comments
@@ -771,7 +782,7 @@ require('lazy').setup({
     version = '*',
     dependencies = 'nvim-tree/nvim-web-devicons',
     init = function()
-      vim.opt.termguicolors = true
+      -- vim.opt.termguicolors = true
       require('bufferline').setup {
         options = {
           hover = {
@@ -800,6 +811,7 @@ require('lazy').setup({
       require('lualine').setup {
         options = {
           component_separators = { left = '', right = '' },
+          -- theme = 'jellybeans',
           section_separators = { left = '', right = '' },
           refresh = {
             statusline = 65,
@@ -1060,6 +1072,12 @@ require('lazy').setup({
       }
     end,
   },
+
+  -- {
+  --   'rktjmp/lush.nvim',
+  --   -- if you wish to use your own colorscheme:
+  --   -- { dir = '/absolute/path/to/colorscheme', lazy = true },
+  -- },
 }, {
   ui = {},
 })
