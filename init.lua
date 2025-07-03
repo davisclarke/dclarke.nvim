@@ -1,7 +1,8 @@
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 vim.g.have_nerd_font = true
--- Backround
+
+-- Background
 -- Controlled by theme swticher script in /home/davisc/.config/sway
 -- Ignore any changes to the line below
 vim.opt.background = 'dark'
@@ -18,7 +19,7 @@ vim.opt.relativenumber = true
 vim.opt.ruler = false
 vim.opt.numberwidth = 2
 vim.opt.redrawtime = 100
--- vim.opt.cmdheight = 0
+vim.opt.cmdheight = 0
 -- Enable mouse mode, can be useful for resizing splits for example!
 -- vim.opt.mouse = ''
 
@@ -128,31 +129,31 @@ vim.api.nvim_create_autocmd('TextYankPost', {
     vim.highlight.on_yank()
   end,
 })
-vim.api.nvim_create_user_command('GitAutoCommitPush', function()
-  local date = os.date '%Y-%m-%d %H:%M:%S'
-  local commit_cmd = string.format("git add . && git commit -m ': `date`' && git push", date)
-  local output = vim.fn.system(commit_cmd)
-  if vim.v.shell_error == 0 then
-    vim.notify('Git commit/push 󰄬 ' .. date, vim.log.levels.INFO)
-  else
-    vim.notify('Git commit/push failed: ' .. output, vim.log.levels.ERROR)
-  end
-end, {})
--- Auto-update markdown
-vim.api.nvim_create_autocmd('FileType', {
-  pattern = { 'markdown' },
-  callback = function()
-    vim.schedule(function()
-      vim.keymap.set(
-        'n',
-        '<leader>w',
-        -- ":terminal git pull && git add . && git commit -m '`date`' && git push<CR>! :bd<CR> :echo 'Done!'<CR> ",
-        ':wa<CR>:GitAutoCommitPush<CR>',
-        { buffer = true, desc = '[w]rite all with git commit/push', noremap = true }
-      )
-    end)
-  end,
-})
+-- vim.api.nvim_create_user_command('GitAutoCommitPush', function()
+--   local date = os.date '%Y-%m-%d %H:%M:%S'
+--   local commit_cmd = string.format("git add . && git commit -m ': `date`' && git push", date)
+--   local output = vim.fn.system(commit_cmd)
+--   if vim.v.shell_error == 0 then
+--     vim.notify('Git commit/push 󰄬 ' .. date, vim.log.levels.INFO)
+--   else
+--     vim.notify('Git commit/push failed: ' .. output, vim.log.levels.ERROR)
+--   end
+-- end, {})
+-- -- Auto-update markdown
+-- vim.api.nvim_create_autocmd('FileType', {
+--   pattern = { 'markdown' },
+--   callback = function()
+--     vim.schedule(function()
+--       vim.keymap.set(
+--         'n',
+--         '<leader>w',
+--         -- ":terminal git pull && git add . && git commit -m '`date`' && git push<CR>! :bd<CR> :echo 'Done!'<CR> ",
+--         ':wa<CR>:GitAutoCommitPush<CR>',
+--         { buffer = true, desc = '[w]rite all with git commit/push', noremap = true }
+--       )
+--     end)
+--   end,
+-- })
 
 vim.api.nvim_create_autocmd('FileType', {
   pattern = { 'tex' },
@@ -322,27 +323,27 @@ require('lazy').setup({
     { "<c-s>", mode = { "c" }, function() require("flash").toggle() end, desc = "Toggle Flash Search" },
   },
   },
-  {
-    'nvim-neo-tree/neo-tree.nvim',
-    branch = 'v3.x',
-    dependencies = {
-      'nvim-lua/plenary.nvim',
-      'nvim-tree/nvim-web-devicons', -- not strictly required, but recommended
-      'MunifTanjim/nui.nvim',
-      '3rd/image.nvim', -- Optional image support in preview window: See `# Preview Mode` for more information
-    },
-    opts = {
-      defaults = {
-        layout_strategy = 'horizontal',
-        layout_config = { prompt_position = 'top' },
-        sorting_strategy = 'ascending',
-        winblend = 0,
-      },
-    },
-    config = function()
-      vim.keymap.set('n', '<leader>e', '<cmd>Neotree<CR>', { desc = 'Neotr[e]e' })
-    end,
-  },
+  -- {
+  --   'nvim-neo-tree/neo-tree.nvim',
+  --   branch = 'v3.x',
+  --   dependencies = {
+  --     'nvim-lua/plenary.nvim',
+  --     'nvim-tree/nvim-web-devicons', -- not strictly required, but recommended
+  --     'MunifTanjim/nui.nvim',
+  --     '3rd/image.nvim', -- Optional image support in preview window: See `# Preview Mode` for more information
+  --   },
+  --   opts = {
+  --     defaults = {
+  --       layout_strategy = 'horizontal',
+  --       layout_config = { prompt_position = 'top' },
+  --       sorting_strategy = 'ascending',
+  --       winblend = 0,
+  --     },
+  --   },
+  --   config = function()
+  --     vim.keymap.set('n', '<leader>e', '<cmd>Neotree<CR>', { desc = 'Neotr[e]e' })
+  --   end,
+  -- },
   -- LSP Plugins
   {
     'mrcjkb/rustaceanvim',
@@ -371,6 +372,41 @@ require('lazy').setup({
       })
     end,
   },
+  -- lazy.nvim
+  -- {
+  --   'folke/noice.nvim',
+  --   event = 'VeryLazy',
+  --   opts = {
+  --     window_opts = {},
+  --     cmdline = {
+  --       view = 'cmdline',
+  --     },
+  --     lsp = {
+  --       -- override markdown rendering so that **cmp** and other plugins use **Treesitter**
+  --       override = {
+  --         ['vim.lsp.util.convert_input_to_markdown_lines'] = true,
+  --         ['vim.lsp.util.stylize_markdown'] = true,
+  --         ['cmp.entry.get_documentation'] = true, -- requires hrsh7th/nvim-cmp
+  --       },
+  --     },
+  --     -- you can enable a preset for easier configuration
+  --     presets = {
+  --       bottom_search = true, -- use a classic bottom cmdline for search
+  --       command_palette = false, -- position the cmdline and popupmenu together
+  --       long_message_to_split = true, -- long messages will be sent to a split
+  --       inc_rename = false, -- enables an input dialog for inc-rename.nvim
+  --       lsp_doc_border = false, -- add a border to hover docs and signature help
+  --     },
+  --   },
+  --   dependencies = {
+  --     -- if you lazy-load any plugin below, make sure to add proper `module="..."` entries
+  --     'MunifTanjim/nui.nvim',
+  --     -- OPTIONAL:
+  --     --   `nvim-notify` is only needed, if you want to use the notification view.
+  --     --   If not available, we use `mini` as the fallback
+  --     'rcarriga/nvim-notify',
+  --   },
+  -- },
   {
     -- `lazydev` configures Lua LSP for your Neovim config, runtime and plugins
     -- used for completion, annotations and signatures of Neovim apis
@@ -453,7 +489,7 @@ require('lazy').setup({
       },
 
       -- (Default) Only show the documentation popup when manually triggered
-      completion = { documentation = { auto_show = false } },
+      completion = { documentation = { auto_show = false }, menu = { scrollbar = false } },
 
       -- Default list of enabled providers defined so that you can extend it
       -- elsewhere in your config, without redefining it, due to `opts_extend`
@@ -505,6 +541,7 @@ require('lazy').setup({
           },
         },
         texlab = {},
+        marksman = {},
         lua_ls = {
           -- cmd = { ... },
           -- filetypes = { ... },
@@ -694,62 +731,47 @@ require('lazy').setup({
   },
   -- lazy.nvim
   { 'rktjmp/shipwright.nvim' },
-  -- {
-  --   'ramojus/mellifluous.nvim',
-  --   -- version = "v0.*", -- uncomment for stable config (some features might be missed if/when v1 comes out)
-  --   config = function()
-  --     require('mellifluous').setup {} -- optional, see configuration section.
-  --     vim.cmd 'colorscheme mellifluous'
-  --   end,
-  -- },
   {
-    'aktersnurra/no-clown-fiesta.nvim',
-    priority = 1000,
+    'wtfox/jellybeans.nvim',
     lazy = false,
+    priority = 1000,
+    opts = {
+      styles = { functions = { fg = '#000000' } },
+      -- plugins = { all = false },
+      on_highlights = function(hl, c)
+        hl.Structure = { fg = c.foreground, bold = true }
+        -- hl.Special = { fg = '#00ff00', bold = true }
+      end,
+      on_colors = function(c)
+        if vim.o.background == 'light' then
+          c.background = '#f9f9f9'
+          c.grey_one = '#e1e1e1'
+          c.grey_three = '#dddddd'
+          c.float_bg = '#e1e1e1'
+          c.cocoa_brown = '#e6e6e6'
+        else
+          -- c.background = '#101010'
+          -- c.background = '#000000'
+          c.background = '#0a0a0a'
+          -- c.foreground = '#d4d4d4' -- Make grey/fg the same
+          -- c.grey_two = '#d4d4d4'
+          -- c.total_white = '#d4d4d4'
+          -- c.grey_one = '#101010'
+          -- c.grey_three = '#101010'
+          -- c.float_bg = '#101010'
+          c.cocoa_brown = '#252525'
+          c.grey_one = '#1c1c1c'
+          c.grey_three = '#333333'
+          c.float_bg = '#252525'
+        end
+      end,
+    },
     init = function()
-      vim.cmd [[colorscheme no-clown-fiesta]]
+      vim.cmd [[colorscheme jellybeans ]]
+      -- vim.api.nvim_set_hl(0, 'NormalFloat', { bg = '#252525' }) -- Change #282C34 to your desired background color
+      -- vim.api.nvim_set_hl(0, 'FloatBorder', { bg = '#252525', fg = '#8892B0' }) -- Optional: Set border color and its background
     end,
   },
-  -- {
-  --   'savq/melange-nvim',
-  --   lazy = false,
-  --   priority = 1000,
-  --   init = function()
-  --     local group = vim.api.nvim_create_augroup('OverrideMelange', {})
-  --     vim.api.nvim_create_autocmd('ColorScheme', {
-  --       pattern = 'melange',
-  --       callback = function()
-  --         if vim.o.background == 'dark' then
-  --           vim.api.nvim_set_hl(0, 'Normal', { bg = '#151515' })
-  --         else
-  --           vim.api.nvim_set_hl(0, 'Normal', { bg = '#f9f9f9' })
-  --         end
-  --       end,
-  --       group = group,
-  --     })
-  --     vim.cmd [[colorscheme melange]]
-  --   end,
-  -- },
-  -- {
-  --   'wtfox/jellybeans.nvim',
-  --   lazy = false,
-  --   priority = 1000,
-  --   opts = {
-  --     -- plugins = { auto = false },
-  --     italics = false,
-  --     on_colors = function(c)
-  --       local light_bg = '#f9f9f9' -- Change the default light bg
-  --       local dark_bg = '#060606'
-  --       local light_fg = '#000000'
-  --       local dark_fg = '#e8e8e8'
-  --       c.background = vim.o.background == 'light' and light_bg or dark_bg
-  --       c.foreground = vim.o.background == 'light' and light_fg or dark_fg
-  --     end,
-  --   },
-  --   init = function()
-  --     vim.cmd [[colorscheme jellybeans ]]
-  --   end,
-  -- },
   -- Highlight todo, notes, etc in comments
   { 'folke/todo-comments.nvim', event = 'VimEnter', dependencies = { 'nvim-lua/plenary.nvim' }, opts = { signs = false } },
 
@@ -810,27 +832,15 @@ require('lazy').setup({
     config = function()
       require('lualine').setup {
         options = {
+          theme = 'jellybeans',
           component_separators = { left = '', right = '' },
-          -- theme = 'jellybeans',
           section_separators = { left = '', right = '' },
-          refresh = {
-            statusline = 65,
-            tabline = 65,
-            winbar = 65,
-          },
         },
         sections = {
-          -- lualine_a = {
-          --   {
-          --     'mode',
-          --     fmt = function(str)
-          --       return str:sub(1, 1)
-          --     end,
-          --   },
-          -- },
-          lualine_c = { 'branch', 'diff' },
-          lualine_b = { 'filename' },
-          lualine_x = { 'diagnostics', 'filetype' },
+          lualine_a = { 'mode' },
+          lualine_b = { 'branch', 'diff', 'diagnostics' },
+          lualine_c = { 'filename' },
+          lualine_x = { 'filetype' },
           lualine_y = { 'progress' },
           lualine_z = { 'location' },
         },
@@ -868,10 +878,10 @@ require('lazy').setup({
           { icon = "", key = "s", desc = "Last Project", section = "session", padding= 1, },
           { icon = "", key = "f", desc = "Find File", action = ":lua Snacks.dashboard.pick('files')" },
           { icon = "", key = "g", desc = "Grep", action = ":lua Snacks.dashboard.pick('live_grep')" },
-          { icon = "", key = "c", desc = "Config", action = ":e /home/davisc/.config/nvim/init.lua" },
+          -- { icon = "", key = "c", desc = "Config", action = ":e /home/davisc/.config/nvim/init.lua" },
           { icon = " ", key = "n", desc = "New File", action = ":ene | startinsert" },
-          { icon = "󰒲", key = "l", desc = "Lazy", action = ":Lazy" },
-          { icon = "󰢛", key = "m", desc = "Mason", action = ":Mason" },
+          -- { icon = "󰒲", key = "l", desc = "Lazy", action = ":Lazy" },
+          -- { icon = "󰢛", key = "m", desc = "Mason", action = ":Mason" },
           { icon = " ", key = "q", desc = "Quit", action = ":qa" },
         },
         },
@@ -982,60 +992,60 @@ require('lazy').setup({
       }
     end,
   },
-  {
-    'epwalsh/obsidian.nvim',
-    version = '*', -- recommended, use latest release instead of latest commit
-    lazy = true,
-    ft = 'markdown',
-    -- Replace the above line with this if you only want to load obsidian.nvim for markdown files in your vault:
-    -- event = {
-    --   -- If you want to use the home shortcut '~' here you need to call 'vim.fn.expand'.
-    --   -- E.g. "BufReadPre " .. vim.fn.expand "~" .. "/my-vault/*.md"
-    --   -- refer to `:h file-pattern` for more examples
-    --   "BufReadPre path/to/my-vault/*.md",
-    --   "BufNewFile path/to/my-vault/*.md",
-    -- },
-    --
-    dependencies = {
-      -- Required.
-      'nvim-lua/plenary.nvim',
-      'hrsh7th/nvim-cmp',
-      'ibhagwan/fzf-lua',
-    },
-    opts = {
-      workspaces = {
-        {
-          name = 'agenda',
-          path = '~/agenda',
-          overrides = {
-            disable_frontmatter = true,
-          },
-        },
-        {
-          name = 'no-vault',
-          path = function()
-            -- alternatively use the CWD:
-            return assert(vim.fn.getcwd())
-            -- return assert(vim.fs.dirname(vim.api.nvim_buf_get_name(0)))
-          end,
-          overrides = {
-            notes_subdir = vim.NIL, -- have to use 'vim.NIL' instead of 'nil'
-            new_notes_location = 'current_dir',
-            templates = {
-              folder = vim.NIL,
-            },
-            disable_frontmatter = true,
-          },
-        },
-      },
-      ui = {
-        checkboxes = {
-          [' '] = { char = '󰄱', hl_group = 'ObsidianTodo' },
-          ['x'] = { char = '', hl_group = 'ObsidianDone' },
-        },
-      },
-    },
-  },
+  -- {
+  --   'epwalsh/obsidian.nvim',
+  --   version = '*', -- recommended, use latest release instead of latest commit
+  --   lazy = true,
+  --   ft = 'markdown',
+  --   -- Replace the above line with this if you only want to load obsidian.nvim for markdown files in your vault:
+  --   -- event = {
+  --   --   -- If you want to use the home shortcut '~' here you need to call 'vim.fn.expand'.
+  --   --   -- E.g. "BufReadPre " .. vim.fn.expand "~" .. "/my-vault/*.md"
+  --   --   -- refer to `:h file-pattern` for more examples
+  --   --   "BufReadPre path/to/my-vault/*.md",
+  --   --   "BufNewFile path/to/my-vault/*.md",
+  --   -- },
+  --   --
+  --   dependencies = {
+  --     -- Required.
+  --     'nvim-lua/plenary.nvim',
+  --     'hrsh7th/nvim-cmp',
+  --     'ibhagwan/fzf-lua',
+  --   },
+  --   opts = {
+  --     workspaces = {
+  --       {
+  --         name = 'agenda',
+  --         path = '~/agenda',
+  --         overrides = {
+  --           disable_frontmatter = true,
+  --         },
+  --       },
+  --       {
+  --         name = 'no-vault',
+  --         path = function()
+  --           -- alternatively use the CWD:
+  --           return assert(vim.fn.getcwd())
+  --           -- return assert(vim.fs.dirname(vim.api.nvim_buf_get_name(0)))
+  --         end,
+  --         overrides = {
+  --           notes_subdir = vim.NIL, -- have to use 'vim.NIL' instead of 'nil'
+  --           new_notes_location = 'current_dir',
+  --           templates = {
+  --             folder = vim.NIL,
+  --           },
+  --           disable_frontmatter = true,
+  --         },
+  --       },
+  --     },
+  --     ui = {
+  --       checkboxes = {
+  --         [' '] = { char = '󰄱', hl_group = 'ObsidianTodo' },
+  --         ['x'] = { char = '', hl_group = 'ObsidianDone' },
+  --       },
+  --     },
+  --   },
+  -- },
 
   {
     'NeogitOrg/neogit',
@@ -1073,11 +1083,11 @@ require('lazy').setup({
     end,
   },
 
-  -- {
-  --   'rktjmp/lush.nvim',
-  --   -- if you wish to use your own colorscheme:
-  --   -- { dir = '/absolute/path/to/colorscheme', lazy = true },
-  -- },
+  {
+    'rktjmp/lush.nvim',
+    -- if you wish to use your own colorscheme:
+    -- { dir = '/absolute/path/to/colorscheme', lazy = true },
+  },
 }, {
   ui = {},
 })
