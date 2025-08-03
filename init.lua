@@ -1,9 +1,8 @@
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 vim.g.have_nerd_font = true
-
 -- Background
--- Controlled by theme swticher script in /home/davisc/.config/sway
+-- Controlled by theme switcher script in /home/davisc/.config/sway
 -- Ignore any changes to the line below
 vim.opt.background = 'dark'
 
@@ -19,13 +18,14 @@ vim.opt.relativenumber = true
 vim.opt.ruler = false
 vim.opt.numberwidth = 2
 vim.opt.redrawtime = 100
-vim.opt.cmdheight = 0
+vim.opt.cmdheight = 1
 -- Enable mouse mode, can be useful for resizing splits for example!
 -- vim.opt.mouse = ''
 
 -- Don't show the mode, since it's already in the status line
-vim.opt.showmode = false
-
+vim.opt.showmode = true
+vim.opt.laststatus = 2
+vim.opt.statusline = '%f %m %r %=  %y %3p%% %8(%l,%c%)'
 -- EOB
 vim.opt.fillchars = { eob = ' ' }
 -- Sync clipboard between OS and Neovim.
@@ -129,6 +129,15 @@ vim.api.nvim_create_autocmd('TextYankPost', {
     vim.highlight.on_yank()
   end,
 })
+
+-- Toggle completions
+vim.keymap.set('n', '<leader>tc', function()
+  if vim.b.completion == true then
+    vim.b.completion = false
+  else
+    vim.b.completion = true
+  end
+end, { desc = '[t]oggle autocompletions' })
 -- vim.api.nvim_create_user_command('GitAutoCommitPush', function()
 --   local date = os.date '%Y-%m-%d %H:%M:%S'
 --   local commit_cmd = string.format("git add . && git commit -m ': `date`' && git push", date)
@@ -187,7 +196,6 @@ vim.opt.rtp:prepend(lazypath)
 --    :Lazy update
 --
 -- NOTE: Here is where you install your plugins.
-
 require('lazy').setup({
   -- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
   'tpope/vim-sleuth', -- Detect tabstop and shiftwidth automatically
@@ -284,9 +292,9 @@ require('lazy').setup({
       require('fzf-lua').setup {
         winopts = {
           backdrop = 100, -- Disable backdrop dim
-          border = 'single',
+          border = 'none',
           preview = {
-            border = 'single',
+            border = 'none',
             layout = 'flex',
           },
         },
@@ -344,6 +352,7 @@ require('lazy').setup({
   --     vim.keymap.set('n', '<leader>e', '<cmd>Neotree<CR>', { desc = 'Neotr[e]e' })
   --   end,
   -- },
+  { 'mbbill/undotree' },
   -- LSP Plugins
   {
     'mrcjkb/rustaceanvim',
@@ -371,6 +380,9 @@ require('lazy').setup({
         end,
       })
     end,
+  },
+  {
+    'JuliaEditorSupport/julia-vim',
   },
   -- lazy.nvim
   -- {
@@ -420,13 +432,13 @@ require('lazy').setup({
     },
   },
   { 'Bilal2453/luvit-meta', lazy = true },
-  -- {
-  --   'L3MON4D3/LuaSnip',
-  --   -- follow latest release.
-  --   version = 'v2.*', -- Replace <CurrentMajor> by the latest released major (first number of latest release)
-  --   -- install jsregexp (optional!).
-  --   build = 'make install_jsregexp',
-  -- },
+  {
+    'L3MON4D3/LuaSnip',
+    -- follow latest release.
+    version = 'v2.*', -- Replace <CurrentMajor> by the latest released major (first number of latest release)
+    -- install jsregexp (optional!).
+    build = 'make install_jsregexp',
+  },
   -- {
   --   'lervag/vimtex',
   --   lazy = false, -- lazy-loading will disable inverse search
@@ -455,10 +467,6 @@ require('lazy').setup({
   },
   {
     'saghen/blink.cmp',
-    -- optional: provides snippets for the snippet source
-    dependencies = { 'rafamadriz/friendly-snippets' },
-
-    -- use a release tag to download pre-built binaries
     version = '1.*',
     -- AND/OR build from source, requires nightly: https://rust-lang.github.io/rustup/concepts/channels.html#working-with-nightly-rust
     -- build = 'cargo build --release',
@@ -542,6 +550,7 @@ require('lazy').setup({
         },
         texlab = {},
         marksman = {},
+        julials = {},
         lua_ls = {
           -- cmd = { ... },
           -- filetypes = { ... },
@@ -732,47 +741,81 @@ require('lazy').setup({
   -- lazy.nvim
   { 'rktjmp/shipwright.nvim' },
   {
-    'wtfox/jellybeans.nvim',
-    lazy = false,
+    'ellisonleao/gruvbox.nvim',
     priority = 1000,
-    opts = {
-      styles = { functions = { fg = '#000000' } },
-      -- plugins = { all = false },
-      on_highlights = function(hl, c)
-        hl.Structure = { fg = c.foreground, bold = true }
-        -- hl.Special = { fg = '#00ff00', bold = true }
-      end,
-      on_colors = function(c)
-        if vim.o.background == 'light' then
-          c.background = '#f9f9f9'
-          c.grey_one = '#e1e1e1'
-          c.grey_three = '#dddddd'
-          c.float_bg = '#e1e1e1'
-          c.cocoa_brown = '#e6e6e6'
-        else
-          -- c.background = '#101010'
-          -- c.background = '#000000'
-          c.background = '#0a0a0a'
-          -- c.foreground = '#d4d4d4' -- Make grey/fg the same
-          -- c.grey_two = '#d4d4d4'
-          -- c.total_white = '#d4d4d4'
-          -- c.grey_one = '#101010'
-          -- c.grey_three = '#101010'
-          -- c.float_bg = '#101010'
-          c.cocoa_brown = '#252525'
-          c.grey_one = '#1c1c1c'
-          c.grey_three = '#333333'
-          c.float_bg = '#252525'
-        end
-      end,
-    },
+    config = true,
+    opts = { contrast = 'hard' },
     init = function()
-      vim.cmd [[colorscheme jellybeans ]]
-      -- vim.api.nvim_set_hl(0, 'NormalFloat', { bg = '#252525' }) -- Change #282C34 to your desired background color
-      -- vim.api.nvim_set_hl(0, 'FloatBorder', { bg = '#252525', fg = '#8892B0' }) -- Optional: Set border color and its background
+      vim.cmd [[colorscheme gruvbox]]
     end,
   },
-  -- Highlight todo, notes, etc in comments
+  -- {
+  --   'wtfox/jellybeans.nvim',
+  --   priority = 1000,
+  --   opts = {
+  --     -- plugins = { all = false },
+  --     -- on_highlights = function(hl, c)
+  --     --   -- hl.Structure = { fg = c.foreground, bold = true }
+  --     --   -- hl.Constant = { fg = c.foreground }
+  --     --   -- hl.Operator = { fg = c.foreground }
+  --     --   -- hl.Include = { fg = c.koromiko }
+  --     --   -- hl.Function = { fg = c.morning_glory }
+  --     --   -- hl.Statement = { fg = c.goldenrod }
+  --     --   -- hl.Constant = { fg = c.foreground }
+  --     --   -- hl.Special = { fg = '#00ff00', bold = true }
+  --     -- end,
+  --     on_colors = function(c)
+  --       if vim.o.background == 'light' then
+  --         c.background = '#f9f9f9'
+  --         c.grey_one = '#e1e1e1'
+  --         c.grey_three = '#dddddd'
+  --         c.float_bg = '#e1e1e1'
+  --         c.cocoa_brown = '#e6e6e6'
+  --       else
+  --         c.background = '#151515'
+  --         -- c.background = '#000000'
+  --         -- c.background = '#0a0a0a'
+  --         -- c.foreground = '#d4d4d4' -- Make grey/fg the same
+  --         -- c.grey_two = '#d4d4d4'
+  --         -- c.total_white = '#d4d4d4'
+  --         -- c.grey_one = '#101010'
+  --         -- c.grey_three = '#101010'
+  --         -- c.float_bg = '#101010'
+  --         c.foreground = '#e8e8e3'
+  --         -- c.foreground = '#cccccc'
+  --
+  --         -- c.cocoa_brown = '#101010'
+  --         -- c.grey_one = '#090909'
+  --         -- c.grey_three = '#151515'
+  --         -- c.float_bg = '#101010'
+  --         c.cocoa_brown = '#303030'
+  --         c.grey_one = '#1c1c1c'
+  --         c.grey_three = '#333333'
+  --         c.float_bg = '#252525'
+  --       end
+  --     end,
+  --   },
+  --   init = function()
+  --     vim.cmd [[colorscheme jellybeans ]]
+  --   end,
+  -- },
+  -- {
+  --   'savq/melange-nvim',
+  --   priority = 1000,
+  --   lazy = false,
+  --   init = function()
+  --     -- Transparent bg
+  --     -- local group = vim.api.nvim_create_augroup('OverrideMelange', {})
+  --     -- vim.api.nvim_create_autocmd('ColorScheme', {
+  --     --   pattern = 'melange',
+  --     --   callback = function()
+  --     --     vim.api.nvim_set_hl(0, 'Normal', { bg = 'NONE' })
+  --     --   end,
+  --     --   group = group,
+  --     -- })
+  --     vim.cmd.colorscheme 'melange'
+  --   end,
+  -- },
   { 'folke/todo-comments.nvim', event = 'VimEnter', dependencies = { 'nvim-lua/plenary.nvim' }, opts = { signs = false } },
 
   { -- Collection of various small independent plugins/modules
@@ -826,68 +869,68 @@ require('lazy').setup({
       }
     end,
   },
-  {
-    'nvim-lualine/lualine.nvim',
-    dependencies = { 'nvim-tree/nvim-web-devicons' },
-    config = function()
-      require('lualine').setup {
-        options = {
-          theme = 'jellybeans',
-          component_separators = { left = '', right = '' },
-          section_separators = { left = '', right = '' },
-        },
-        sections = {
-          lualine_a = { 'mode' },
-          lualine_b = { 'branch', 'diff', 'diagnostics' },
-          lualine_c = { 'filename' },
-          lualine_x = { 'filetype' },
-          lualine_y = { 'progress' },
-          lualine_z = { 'location' },
-        },
-      }
-    end,
-  },
-  {
-    'folke/snacks.nvim',
-    priority = 1000,
-    lazy = false,
-    enabled = true,
-    ---@type.Config
-    opts = {
-      dashboard = {
-        enabled = true,
-        -- Maybe later
-        preset = {
-          header = [[
-
-####
-  ####
-    ####
-       ####
-       #####
-       #######
-       #### ####
-       ####   ####
-       ####     ####
-       ####       ####
-                             ]],
-        -- stylua: ignore
-        ---@type snacks.dashboard.Item[]
-        keys = {
-          { icon = "", title = "Recent Files", section = "recent_files", indent = 3, padding = 1, key = "r", desc = "Recent Files", action = ":lua Snacks.dashboard.pick('oldfiles')", limit = 3 },
-          { icon = "", key = "s", desc = "Last Project", section = "session", padding= 1, },
-          { icon = "", key = "f", desc = "Find File", action = ":lua Snacks.dashboard.pick('files')" },
-          { icon = "", key = "g", desc = "Grep", action = ":lua Snacks.dashboard.pick('live_grep')" },
-          -- { icon = "", key = "c", desc = "Config", action = ":e /home/davisc/.config/nvim/init.lua" },
-          { icon = " ", key = "n", desc = "New File", action = ":ene | startinsert" },
-          -- { icon = "󰒲", key = "l", desc = "Lazy", action = ":Lazy" },
-          -- { icon = "󰢛", key = "m", desc = "Mason", action = ":Mason" },
-          { icon = " ", key = "q", desc = "Quit", action = ":qa" },
-        },
-        },
-      },
-    },
-  },
+  -- {
+  --   'nvim-lualine/lualine.nvim',
+  --   dependencies = { 'nvim-tree/nvim-web-devicons' },
+  --   config = function()
+  --     require('lualine').setup {
+  --       options = {
+  --         -- theme = 'jellybeans',
+  --         component_separators = { left = '', right = '' },
+  --         section_separators = { left = '', right = '' },
+  --       },
+  --       sections = {
+  --         lualine_a = { 'mode' },
+  --         lualine_b = { 'branch', 'diagnostics' },
+  --         lualine_c = { 'filename' },
+  --         lualine_x = { 'filetype' },
+  --         lualine_y = { 'progress' },
+  --         lualine_z = { 'location' },
+  --       },
+  --     }
+  --   end,
+  -- },
+  --   {
+  --     'folke/snacks.nvim',
+  --     priority = 1000,
+  --     lazy = false,
+  --     enabled = true,
+  --     ---@type.Config
+  --     opts = {
+  --       dashboard = {
+  --         enabled = true,
+  --         -- Maybe later
+  --         preset = {
+  --           header = [[
+  --
+  -- ####
+  --   ####
+  --     ####
+  --        ####
+  --        #####
+  --        #######
+  --        #### ####
+  --        ####   ####
+  --        ####     ####
+  --        ####       ####
+  --                              ]],
+  --         -- stylua: ignore
+  --         ---@type snacks.dashboard.Item[]
+  --         keys = {
+  --           { icon = "", title = "Recent Files", section = "recent_files", indent = 3, padding = 1, key = "r", desc = "Recent Files", action = ":lua Snacks.dashboard.pick('oldfiles')", limit = 3 },
+  --           { icon = "", key = "s", desc = "Last Project", section = "session", padding= 1, },
+  --           { icon = "", key = "f", desc = "Find File", action = ":lua Snacks.dashboard.pick('files')" },
+  --           { icon = "", key = "g", desc = "Grep", action = ":lua Snacks.dashboard.pick('live_grep')" },
+  --           -- { icon = "", key = "c", desc = "Config", action = ":e /home/davisc/.config/nvim/init.lua" },
+  --           { icon = " ", key = "n", desc = "New File", action = ":ene | startinsert" },
+  --           -- { icon = "󰒲", key = "l", desc = "Lazy", action = ":Lazy" },
+  --           -- { icon = "󰢛", key = "m", desc = "Mason", action = ":Mason" },
+  --           { icon = " ", key = "q", desc = "Quit", action = ":qa" },
+  --         },
+  --         },
+  --       },
+  --     },
+  --   },
   { -- Highlight, edit, and navigate code
     'nvim-treesitter/nvim-treesitter',
     build = ':TSUpdate',
@@ -1083,11 +1126,15 @@ require('lazy').setup({
     end,
   },
 
-  {
-    'rktjmp/lush.nvim',
-    -- if you wish to use your own colorscheme:
-    -- { dir = '/absolute/path/to/colorscheme', lazy = true },
-  },
+  -- {
+  --   'rktjmp/lush.nvim',
+  --   -- if you wish to use your own colorscheme:
+  --   priority = 1000,
+  --   { dir = '/home/davisc/.config/nvim/colors', lazy = false },
+  --   init = function()
+  --     vim.cmd.colorscheme 'colors'
+  --   end,
+  -- },
 }, {
   ui = {},
 })
