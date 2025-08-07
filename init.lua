@@ -740,13 +740,27 @@ require('lazy').setup({
   },
   -- lazy.nvim
   { 'rktjmp/shipwright.nvim' },
+  -- {
+  --   'ellisonleao/gruvbox.nvim',
+  --   priority = 1000,
+  --   config = true,
+  --   opts = { contrast = 'hard', italic = { strings = false } },
+  --   init = function()
+  --     vim.cmd [[colorscheme gruvbox]]
+  --   end,
+  -- },
+
   {
-    'ellisonleao/gruvbox.nvim',
+    'sainnhe/gruvbox-material',
     priority = 1000,
-    config = true,
-    opts = { contrast = 'hard' },
+    -- config = true,
+    -- opts = { contrast = 'hard' },
     init = function()
-      vim.cmd [[colorscheme gruvbox]]
+      -- vim.g.
+      --
+      vim.g.gruvbox_material_background = 'hard'
+      vim.g.gruvbox_material_foreground = 'original'
+      vim.cmd [[colorscheme gruvbox-material]]
     end,
   },
   -- {
@@ -842,33 +856,33 @@ require('lazy').setup({
       -- }
     end,
   },
-  {
-    'akinsho/bufferline.nvim',
-    version = '*',
-    dependencies = 'nvim-tree/nvim-web-devicons',
-    init = function()
-      -- vim.opt.termguicolors = true
-      require('bufferline').setup {
-        options = {
-          hover = {
-            enabled = true,
-            delay = 200,
-            reveal = { 'close' },
-          },
-          show_buffer_close_icons = false,
-          show_close_icon = false,
-          indicator = { style = 'none' },
-          -- auto_toggle_bufferline = true,
-          always_show_bufferline = false,
-          -- custom_filter = function(buf_number, buf_numbers)
-          --   if buf_numbers[1] ~= buf_number then
-          --     return true
-          --   end
-          -- end,
-        },
-      }
-    end,
-  },
+  -- {
+  --   'akinsho/bufferline.nvim',
+  --   version = '*',
+  --   dependencies = 'nvim-tree/nvim-web-devicons',
+  --   init = function()
+  --     -- vim.opt.termguicolors = true
+  --     require('bufferline').setup {
+  --       options = {
+  --         hover = {
+  --           enabled = true,
+  --           delay = 200,
+  --           reveal = { 'close' },
+  --         },
+  --         show_buffer_close_icons = false,
+  --         show_close_icon = false,
+  --         indicator = { style = 'none' },
+  --         -- auto_toggle_bufferline = true,
+  --         always_show_bufferline = false,
+  --         -- custom_filter = function(buf_number, buf_numbers)
+  --         --   if buf_numbers[1] ~= buf_number then
+  --         --     return true
+  --         --   end
+  --         -- end,
+  --       },
+  --     }
+  --   end,
+  -- },
   -- {
   --   'nvim-lualine/lualine.nvim',
   --   dependencies = { 'nvim-tree/nvim-web-devicons' },
@@ -1125,16 +1139,6 @@ require('lazy').setup({
       }
     end,
   },
-
-  -- {
-  --   'rktjmp/lush.nvim',
-  --   -- if you wish to use your own colorscheme:
-  --   priority = 1000,
-  --   { dir = '/home/davisc/.config/nvim/colors', lazy = false },
-  --   init = function()
-  --     vim.cmd.colorscheme 'colors'
-  --   end,
-  -- },
 }, {
   ui = {},
 })
